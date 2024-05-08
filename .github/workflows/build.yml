@@ -35,6 +35,7 @@ jobs:
     needs: native-build
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         target: [
           'alpha-unknown-linux-gnu',
@@ -78,7 +79,7 @@ jobs:
     - name: Upload artifact
       uses: actions/upload-artifact@main
       with:
-        name: cross-toolchain
+        name: cross-toolchain-${{ matrix.target }}
         if-no-files-found: error
         path: |
           /tmp/${{ matrix.target }}.tar.xz
