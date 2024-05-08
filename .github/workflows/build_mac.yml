@@ -30,7 +30,7 @@ jobs:
         if [ ${{ matrix.os }} == 'macos-12' ]; then
           echo "build_host=x86_64-apple-darwin" >> $GITHUB_ENV
         else
-          echo "build_host=aarch64-apple-darwin" >> $GITHUB_ENV
+          echo "build_host=arm64-apple-darwin" >> $GITHUB_ENV
         fi
     - name: Rm cli
       run: |
