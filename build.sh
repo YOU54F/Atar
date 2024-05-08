@@ -52,8 +52,9 @@ if ! (( is_native )); then
 		source "./submodules/obggcc/toolchains/${build_type}.sh"
 	elif [ "$(uname -s)" == 'Darwin' ]; then
 		CROSS_COMPILE_TRIPLET=$build_type
+		cross_compile_flags+="--build=${CROSS_COMPILE_TRIPLET} "
 	fi
-	cross_compile_flags+="--host=${CROSS_COMPILE_TRIPLET} --build=${CROSS_COMPILE_TRIPLET} "
+	cross_compile_flags+="--host=${CROSS_COMPILE_TRIPLET}"
 fi
 echo "Cross compile flags: ${cross_compile_flags}"
 
@@ -162,10 +163,10 @@ fi
 [ -d "${binutils_directory}/build" ] || mkdir "${binutils_directory}/build"
 
 declare -r targets=(
-	'hppa'
-	'alpha'
+	# 'hppa'
+	# 'alpha'
 	'amd64'
-	'i386'
+	# 'i386'
 )
 
 for target in "${targets[@]}"; do
@@ -182,7 +183,16 @@ for target in "${targets[@]}"; do
 	
 	wget --no-verbose "https://mirrors.ucr.ac.cr/pub/OpenBSD/7.0/${target}/base70.tgz" --output-document='/tmp/base.tgz'
 	wget --no-verbose "https://mirrors.ucr.ac.cr/pub/OpenBSD/7.0/${target}/comp70.tgz" --output-document='/tmp/comp.tgz'
-	
+	# Apply patches requires for Apple Silicon
+	if [ "$(uname -s)" == 'Darwin' ]; then
+		cd "${binutils_directory}"
+		# Only apply patch if required, as this loops for multiple targets
+		if patch --forward -p1 --dry-run < /tmp/binutils-apple-silicon.patch; then
+			patch --forward -p1 < /tmp/binutils-apple-silicon.patch
+		else
+			true
+		fi
+	fi
 	cd "${binutils_directory}/build"
 	if [ "$(uname -s)" == 'Darwin' ]; then
 		rm -rf ./*
@@ -218,7 +228,7 @@ for target in "${targets[@]}"; do
 		declare name="${parts[1]}"
 		declare destination="${name#/}.so"
 		
-		ln --symbolic "${source}" "./${destination}"
+		ln -s "${source}" "./${destination}"
 	done <<< "$(find '.' -type 'f' -name 'lib*.so.*')"
 	
 	cd "${gcc_directory}/build"
