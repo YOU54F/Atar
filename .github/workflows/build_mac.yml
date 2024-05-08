@@ -1,0 +1,66 @@
+name: Build MacOS
+
+on:
+  push:
+    branches:
+        - '**'
+
+jobs:
+  cross-build:
+    name: 'Cross build'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ 'macos-latest', macos-12 ]
+        # target: [
+        #   'arm64-apple-darwin',
+        #   'x86_64-apple-darwin',
+        # ]
+      fail-fast: false
+    steps:
+    - uses: actions/checkout@main
+      with:
+        submodules: true
+    - name: Install MacOS toolchain
+      if: runner.os == 'MacOS'
+      run: |
+        brew install texinfo
+    - name: set build_host
+      run: |
+        if [ ${{ matrix.os }} == 'macos-12' ]; then
+          echo "build_host=x86_64-apple-darwin" >> $GITHUB_ENV
+        else
+          echo "build_host=aarch64-apple-darwin" >> $GITHUB_ENV
+        fi
+    - name: Rm cli
+      run: |
+        export SDKROOT=$(xcrun --show-sdk-path)
+        echo $SDKROOT
+        sudo rm -rf /Library/Developer/CommandLineTools
+    - uses: maxim-lobanov/setup-xcode@v1
+      if: matrix.os == 'macos-latest'
+      with:
+        xcode-version: '14.3.1'
+    - uses: maxim-lobanov/setup-xcode@v1
+      if: matrix.os == 'macos-12'
+      with:
+        xcode-version: '14.2.0'
+    - name: check xcode root
+      run: xcrun --show-sdk-path
+    - name: Build Loki with OBGGCC
+      run: |
+        export SDKROOT=$(xcrun --show-sdk-path)
+        ./build.sh ${{ env.build_host }}
+    - name: Generate tarball
+      run: |
+        declare tarball_filename='/tmp/${{ env.build_host }}.tar.xz'
+        tar --directory='/tmp' --create --file=- 'atar' | xz --threads='0' --compress -9 > "${tarball_filename}"
+        shasum -a 256 "${tarball_filename}" | sed 's|/tmp/||' > "${tarball_filename}.sha256"
+    - name: Upload artifact
+      uses: actions/upload-artifact@main
+      with:
+        name: cross-toolchain-${{ env.build_host }}
+        if-no-files-found: error
+        path: |
+          /tmp/${{ env.build_host }}.tar.xz
+          /tmp/${{ env.build_host }}.tar.xz.sha256
