@@ -1,0 +1,12 @@
+--- a/ld/configure.tgt
++++ b/ld/configure.tgt
+@@ -94,6 +94,9 @@ aarch64-*-cloudabi*)	targ_emul=aarch64cloudabi
+ aarch64-*-freebsd*)	targ_emul=aarch64fbsd
+ 			targ_extra_emuls="aarch64fbsdb aarch64elf"
+ 			;;
++aarch64-*-openbsd*)    targ_emul=aarch64fbsd
++            targ_extra_emuls="aarch64fbsdb aarch64elf"
++            ;;
+ aarch64-*-fuchsia*)	targ_emul=aarch64elf
+ 			targ_extra_emuls="aarch64elfb armelf armelfb"
+ 			;;

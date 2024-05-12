@@ -1,0 +1,14 @@
+--- a/libgcc/config.host
++++ b/libgcc/config.host
+@@ -387,6 +387,11 @@ aarch64*-*-freebsd*)
+ 	tmake_file="${tmake_file} ${cpu_type}/t-softfp t-softfp t-crtfm"
+ 	md_unwind_header=aarch64/freebsd-unwind.h
+ 	;;
++aarch64-*-openbsd*)
++	tmake_file="${tmake_file} ${cpu_type}/t-aarch64"
++	tmake_file="${tmake_file} ${cpu_type}/t-softfp t-softfp t-crtfm"
++	md_unwind_header=aarch64/aarch64-unwind.h
++	;;
+ aarch64*-*-fuchsia*)
+ 	tmake_file="${tmake_file} ${cpu_type}/t-aarch64"
+ 	tmake_file="${tmake_file} ${cpu_type}/t-softfp t-softfp"

@@ -1,0 +1,16 @@
+--- a/gcc/config.gcc
++++ b/gcc/config.gcc
+@@ -1138,6 +1138,13 @@ aarch64*-*-freebsd*)
+ 	tm_file="${tm_file} aarch64/aarch64-elf.h aarch64/aarch64-freebsd.h"
+ 	tmake_file="${tmake_file} aarch64/t-aarch64 aarch64/t-aarch64-freebsd"
+ 	;;
++aarch64-*-openbsd*)
++	tm_file="${tm_file} dbxelf.h elfos.h"
++	tm_file="${tm_file} aarch64/aarch64-elf.h openbsd-stdint.h"
++	tm_file="${tm_file} openbsd.h aarch64/openbsd.h openbsd-libpthread.h"
++	tmake_file="${tmake_file} aarch64/t-aarch64"
++	extra_options="${extra_options} openbsd.opt"
++	;;
+ aarch64*-*-linux*)
+ 	tm_file="${tm_file} dbxelf.h elfos.h gnu-user.h linux.h glibc-stdint.h"
+ 	tm_file="${tm_file} aarch64/aarch64-elf.h aarch64/aarch64-linux.h"

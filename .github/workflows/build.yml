@@ -4,6 +4,7 @@ on:
   push:
     branches:
         - '**'
+        - "!openbsd_aarch64"
 
 jobs:
   native-build:

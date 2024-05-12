@@ -86,7 +86,7 @@ fi
 [ -d "${gcc_directory}/build" ] || mkdir "${gcc_directory}/build"
 
 declare -r toolchain_directory="/tmp/atar"
-cp binutils-apple-silicon.patch /tmp
+cp *.patch /tmp
 
 [ -d "${gmp_directory}/build" ] || mkdir "${gmp_directory}/build"
 
@@ -163,16 +163,19 @@ fi
 [ -d "${binutils_directory}/build" ] || mkdir "${binutils_directory}/build"
 
 declare -r targets=(
-	'hppa'
-	'alpha'
-	'amd64'
-	'i386'
+	# 'hppa'
+	# 'alpha'
+	# 'amd64'
+	'arm64'
+	# 'i386'
 )
 
 for target in "${targets[@]}"; do
 	case "${target}" in
 		amd64)
 			declare triplet='x86_64-unknown-openbsd';;
+		arm64)
+			declare triplet='aarch64-unknown-openbsd';;
 		i386)
 			declare triplet='i386-unknown-openbsd';;
 		hppa)
@@ -192,6 +195,7 @@ for target in "${targets[@]}"; do
 		else
 			true
 		fi
+		patch --forward -p1  < /tmp/binutils-aarch64-openbsd-configure.tgt.patch
 	fi
 	cd "${binutils_directory}/build"
 	if [ "$(uname -s)" == 'Darwin' ]; then
@@ -232,6 +236,9 @@ for target in "${targets[@]}"; do
 	done <<< "$(find '.' -type 'f' -name 'lib*.so.*')"
 	
 	cd "${gcc_directory}/build"
+	patch --forward -p1 < /tmp/patch-gcc_config_aarch64_openbsd_h.patch
+	patch --forward -p1 < /tmp/patch-gcc-config-host.patch
+	patch --forward -p1 < /tmp/patch-gcc_config_gcc.patch
 	
 	if [ "$(uname -s)" == 'Darwin' ]; then
 		rm -rf ./*
