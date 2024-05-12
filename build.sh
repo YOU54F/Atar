@@ -236,11 +236,16 @@ for target in "${targets[@]}"; do
 		ln -s "${source}" "./${destination}"
 	done <<< "$(find '.' -type 'f' -name 'lib*.so.*')"
 	
-	cd "${gcc_directory}/build"
-	# patch --forward -p1 < /tmp/patch-gcc_config_aarch64_openbsd_h.patch
-	cp /tmp/openbsd.h "${gcc_directory}/gcc/config/aarch64/openbsd.h"
+	cd "${gcc_directory}"
+	patch --forward -p1 < /tmp/patch-gcc_config_aarch64_openbsd_h.patch
 	patch --forward -p1 < /tmp/patch-gcc-config-host.patch
 	patch --forward -p1 < /tmp/patch-gcc_config_gcc.patch
+	
+	cd "${gcc_directory}/build"
+	# patch --forward -p1 < /tmp/patch-gcc_config_aarch64_openbsd_h.patch
+	# # cp /tmp/openbsd.h "${gcc_directory}/gcc/config/aarch64/openbsd.h"
+	# patch --forward -p1 < /tmp/patch-gcc-config-host.patch
+	# patch --forward -p1 < /tmp/patch-gcc_config_gcc.patch
 	
 	if [ "$(uname -s)" == 'Darwin' ]; then
 		rm -rf ./*
