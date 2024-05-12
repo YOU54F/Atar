@@ -87,6 +87,7 @@ fi
 
 declare -r toolchain_directory="/tmp/atar"
 cp *.patch /tmp
+cp openbsd.h /tmp
 
 [ -d "${gmp_directory}/build" ] || mkdir "${gmp_directory}/build"
 
@@ -236,7 +237,8 @@ for target in "${targets[@]}"; do
 	done <<< "$(find '.' -type 'f' -name 'lib*.so.*')"
 	
 	cd "${gcc_directory}/build"
-	patch --forward -p1 < /tmp/patch-gcc_config_aarch64_openbsd_h.patch
+	# patch --forward -p1 < /tmp/patch-gcc_config_aarch64_openbsd_h.patch
+	cp /tmp/openbsd.h "${gcc_directory}/gcc/config/aarch64/openbsd.h"
 	patch --forward -p1 < /tmp/patch-gcc-config-host.patch
 	patch --forward -p1 < /tmp/patch-gcc_config_gcc.patch
 	

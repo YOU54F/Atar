@@ -1,3 +1,4 @@
+--- a/gcc/config/aarch64/openbsd.h
 +++ b/gcc/config/aarch64/openbsd.h
 @@ -0,0 +1,116 @@
 +/* Definitions of target machine for GNU compiler, OpenBSD/aarch64 ELF version.
